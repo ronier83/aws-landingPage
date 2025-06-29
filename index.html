@@ -255,6 +255,7 @@
       font-family: 'Montserrat', Arial, sans-serif;
       font-weight: 300;
       line-height: 1.6;
+      margin-bottom: 30px;
     }
 
     .loading-spinner {
@@ -265,6 +266,70 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 20px auto 0;
+    }
+
+    .success-message {
+      background-color: rgba(0, 180, 229, 0.1);
+      border: 1px solid rgba(0, 180, 229, 0.3);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 30px auto;
+      max-width: 600px;
+      text-align: left;
+    }
+
+    .success-title {
+      color: #00B4E5;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .success-details {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .success-details strong {
+      color: #00CDAF;
+    }
+
+    .customer-info {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px auto;
+      max-width: 600px;
+      text-align: left;
+    }
+
+    .customer-info-title {
+      color: #00B4E5;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .customer-detail {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .customer-label {
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 500;
+    }
+
+    .customer-value {
+      color: white;
+      font-weight: 400;
+      text-align: right;
+      word-break: break-all;
+      max-width: 60%;
     }
 
     @keyframes fadeInUp {
@@ -338,6 +403,38 @@
       word-break: break-all;
       font-size: 0.95em;
     }
+
+    .next-steps {
+      background-color: rgba(243, 146, 0, 0.1);
+      border: 1px solid rgba(243, 146, 0, 0.3);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 30px auto;
+      max-width: 600px;
+      text-align: left;
+    }
+
+    .next-steps-title {
+      color: #F39200;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .next-steps-content {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .next-steps-content ol {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .next-steps-content li {
+      margin-bottom: 8px;
+    }
   </style>  
 </head>
 
@@ -354,23 +451,50 @@
   </header>
   
   <div class="maincontainer">
-    <div id="dns-form-section" style="display:none; max-width:400px; margin:0 auto 30px auto;">
-      <h3 style="color:#00B4E5;">Choose your portal address</h3>
-      <form id="dns-form">
-        <label for="dns-name">Desired DNS name:</label>
-        <input type="text" id="dns-name" name="dns-name" required placeholder="e.g. mycompany" style="width:100%;margin-bottom:10px;">
-        <button type="submit">Reserve & Register</button>
-      </form>
-      <div id="dns-form-message" style="margin-top:10px;"></div>
-    </div>
     <div class="loading-container">
-      <h2 class="loading-title">Thank You for Subscribing via AWS Marketplace!</h2>
+      <h2 class="loading-title">Welcome to CTERA File Services Platform!</h2>
       <p class="loading-message">
-        We are provisioning your CTERA Portal.<br>
-        You will receive an email with your access details soon.<br>
-        <br>
-        <strong>If you have any questions, please contact our support team.</strong>
+        Thank you for subscribing via AWS Marketplace.<br>
+        Your CTERA Portal has been automatically provisioned.
       </p>
+      
+      <div class="success-message">
+        <div class="success-title">✓ Provisioning Complete</div>
+        <div class="success-details">
+          Your CTERA Portal tenant has been created and configured.<br>
+          <strong>You will receive an email shortly</strong> with your portal URL and login credentials.
+        </div>
+      </div>
+
+      <div class="customer-info" id="customer-info" style="display: none;">
+        <div class="customer-info-title">Subscription Details</div>
+        <div class="customer-detail">
+          <span class="customer-label">Customer ID:</span>
+          <span class="customer-value" id="customer-id">Loading...</span>
+        </div>
+        <div class="customer-detail">
+          <span class="customer-label">Product Code:</span>
+          <span class="customer-value" id="product-code">Loading...</span>
+        </div>
+        <div class="customer-detail">
+          <span class="customer-label">Tenant Name:</span>
+          <span class="customer-value" id="tenant-name">Loading...</span>
+        </div>
+      </div>
+
+      <div class="next-steps">
+        <div class="next-steps-title">Next Steps</div>
+        <div class="next-steps-content">
+          <ol>
+            <li><strong>Check your email</strong> for portal access credentials</li>
+            <li><strong>Log in to your portal</strong> using the provided URL and credentials</li>
+            <li><strong>Change your password</strong> when prompted during first login</li>
+            <li><strong>Configure your portal</strong> according to your organization's needs</li>
+          </ol>
+          <p>If you don't receive the email within 10 minutes, please check your spam folder or contact support.</p>
+        </div>
+      </div>
+
       <button id="show-token-btn" type="button">Show Token for Support</button>
       <div id="token-support-section">
         <span style="color: #00B4E5;">Your AWS Marketplace Token:</span>
@@ -397,36 +521,40 @@
     const tokenSection = document.getElementById('token-support-section');
     const tokenPre = document.getElementById('aws-token');
     const urlParams = new URLSearchParams(window.location.search);
+    
+    // Get parameters from URL
     const awsToken = urlParams.get('x-amzn-marketplace-token') || urlParams.get('token');
+    const customerId = urlParams.get('customer');
+    const productCode = urlParams.get('product');
+    const tenantName = urlParams.get('tenant');
+    
+    // Set token
     tokenPre.textContent = awsToken ? awsToken : 'Not provided';
+    
+    // Show customer info if available
+    if (customerId || productCode || tenantName) {
+      document.getElementById('customer-info').style.display = 'block';
+      
+      if (customerId) {
+        document.getElementById('customer-id').textContent = customerId;
+      }
+      if (productCode) {
+        document.getElementById('product-code').textContent = productCode;
+      }
+      if (tenantName) {
+        document.getElementById('tenant-name').textContent = tenantName + '.use.azure.cterafs.com';
+      } else if (customerId) {
+        // Generate tenant name like the Lambda does
+        const generatedTenant = 'tenant-' + customerId.slice(-8);
+        document.getElementById('tenant-name').textContent = generatedTenant + '.use.azure.cterafs.com';
+      }
+    }
+    
+    // Show token button functionality
     showBtn.addEventListener('click', function() {
       tokenSection.style.display = 'block';
       showBtn.style.display = 'none';
     });
-
-    // DNS form logic
-    const dnsFormSection = document.getElementById('dns-form-section');
-    if (awsToken) {
-      dnsFormSection.style.display = 'block';
-      const dnsForm = document.getElementById('dns-form');
-      dnsForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const dnsName = document.getElementById('dns-name').value;
-        // TODO: Replace with your actual registration endpoint URL
-        fetch('https://5vrhjgx1a0.execute-api.us-east-1.amazonaws.com/prod/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: awsToken, dnsName })
-        })
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('dns-form-message').textContent = data.message || 'Registration submitted!';
-        })
-        .catch(() => {
-          document.getElementById('dns-form-message').textContent = 'Error submitting registration.';
-        });
-      });
-    }
   });
 </script>
 
