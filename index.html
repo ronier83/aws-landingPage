@@ -451,55 +451,129 @@
   </header>
   
   <div class="maincontainer">
-    <div class="loading-container">
-      <h2 class="loading-title">Welcome to CTERA File Services Platform!</h2>
-      <p class="loading-message">
-        Thank you for subscribing via AWS Marketplace.<br>
-        Your CTERA Portal has been automatically provisioned.
-      </p>
-      
-      <div class="success-message">
-        <div class="success-title">✓ Provisioning Complete</div>
-        <div class="success-details">
-          Your CTERA Portal tenant has been created and configured.<br>
-          <strong>You will receive an email shortly</strong> with your portal URL and login credentials.
+    <!-- DNS Selection Section (shown when step=dns-selection) -->
+    <div id="dns-selection-section" style="display: none;">
+      <div class="loading-container">
+        <h2 class="loading-title">Choose Your Portal Address</h2>
+        <p class="loading-message">
+          Please choose a unique name for your CTERA Portal.<br>
+          This will be your portal's web address.
+        </p>
+        
+        <div class="customer-info" id="dns-customer-info" style="display: none;">
+          <div class="customer-info-title">Subscription Details</div>
+          <div class="customer-detail">
+            <span class="customer-label">Customer ID:</span>
+            <span class="customer-value" id="dns-customer-id">Loading...</span>
+          </div>
+          <div class="customer-detail">
+            <span class="customer-label">Product Code:</span>
+            <span class="customer-value" id="dns-product-code">Loading...</span>
+          </div>
+        </div>
+
+        <div style="max-width: 500px; margin: 30px auto;">
+          <form id="dns-form">
+            <div style="margin-bottom: 20px;">
+              <label for="dns-name" style="display: block; color: #00B4E5; font-weight: 600; margin-bottom: 8px;">
+                Choose Portal Name:
+              </label>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input 
+                  type="text" 
+                  id="dns-name" 
+                  name="dns-name" 
+                  required 
+                  placeholder="e.g. mycompany" 
+                  pattern="[a-zA-Z0-9-]{3,20}"
+                  title="3-20 characters, letters, numbers, and hyphens only"
+                  style="flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; background: rgba(255,255,255,0.1); color: white; font-size: 16px;"
+                >
+                <span style="color: rgba(255,255,255,0.7);">.use.azure.cterafs.com</span>
+              </div>
+              <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 5px;">
+                Your portal will be available at: <span id="preview-url" style="color: #00CDAF;">yourname.use.azure.cterafs.com</span>
+              </div>
+            </div>
+            
+            <button 
+              type="submit" 
+              id="provision-btn"
+              style="width: 100%; background-color: #F39200; color: white; border: none; padding: 15px; border-radius: 4px; font-family: 'Montserrat', Arial, sans-serif; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s ease;"
+            >
+              Create My Portal
+            </button>
+          </form>
+          
+          <div id="dns-form-message" style="margin-top: 15px; text-align: center; font-size: 14px;"></div>
+        </div>
+
+        <button id="dns-show-token-btn" type="button" style="margin-top: 30px; background: #00B4E5; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-family: 'Montserrat', Arial, sans-serif; font-weight: 500; cursor: pointer; transition: background 0.3s;">
+          Show Token for Support
+        </button>
+        <div id="dns-token-support-section" style="display: none; margin-top: 20px;">
+          <span style="color: #00B4E5;">Your AWS Marketplace Token:</span>
+          <pre id="dns-aws-token" style="color: #fff; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; word-break: break-all; font-size: 0.95em;">Loading...</pre>
+          <div style="font-size:0.8em; color:rgba(255,255,255,0.7); margin-top:8px;">Share this token with support only if requested.</div>
         </div>
       </div>
+    </div>
 
-      <div class="customer-info" id="customer-info" style="display: none;">
-        <div class="customer-info-title">Subscription Details</div>
-        <div class="customer-detail">
-          <span class="customer-label">Customer ID:</span>
-          <span class="customer-value" id="customer-id">Loading...</span>
+    <!-- Completion Section (shown after provisioning) -->
+    <div id="completion-section">
+      <div class="loading-container">
+        <h2 class="loading-title">Welcome to CTERA File Services Platform!</h2>
+        <p class="loading-message">
+          Thank you for subscribing via AWS Marketplace.<br>
+          Your CTERA Portal has been automatically provisioned.
+        </p>
+        
+        <div class="success-message">
+          <div class="success-title">✓ Provisioning Complete</div>
+          <div class="success-details">
+            Your CTERA Portal tenant has been created and configured with an automatically assigned URL.<br>
+            <strong>You will receive an email shortly</strong> with your portal URL and login credentials.
+          </div>
         </div>
-        <div class="customer-detail">
-          <span class="customer-label">Product Code:</span>
-          <span class="customer-value" id="product-code">Loading...</span>
-        </div>
-        <div class="customer-detail">
-          <span class="customer-label">Tenant Name:</span>
-          <span class="customer-value" id="tenant-name">Loading...</span>
-        </div>
-      </div>
 
-      <div class="next-steps">
-        <div class="next-steps-title">Next Steps</div>
-        <div class="next-steps-content">
-          <ol>
-            <li><strong>Check your email</strong> for portal access credentials</li>
-            <li><strong>Log in to your portal</strong> using the provided URL and credentials</li>
-            <li><strong>Change your password</strong> when prompted during first login</li>
-            <li><strong>Configure your portal</strong> according to your organization's needs</li>
-          </ol>
-          <p>If you don't receive the email within 10 minutes, please check your spam folder or contact support.</p>
+        <div class="customer-info" id="customer-info" style="display: none;">
+          <div class="customer-info-title">Subscription Details</div>
+          <div class="customer-detail">
+            <span class="customer-label">Customer ID:</span>
+            <span class="customer-value" id="customer-id">Loading...</span>
+          </div>
+          <div class="customer-detail">
+            <span class="customer-label">Product Code:</span>
+            <span class="customer-value" id="product-code">Loading...</span>
+          </div>
+          <div class="customer-detail">
+            <span class="customer-label">Portal URL:</span>
+            <span class="customer-value" id="tenant-name">Loading...</span>
+          </div>
+          <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 8px; font-style: italic;">
+            * Portal URL is auto-generated based on your AWS customer ID
+          </div>
         </div>
-      </div>
 
-      <button id="show-token-btn" type="button">Show Token for Support</button>
-      <div id="token-support-section">
-        <span style="color: #00B4E5;">Your AWS Marketplace Token:</span>
-        <pre id="aws-token">Loading...</pre>
-        <div style="font-size:0.8em; color:rgba(255,255,255,0.7); margin-top:8px;">Share this token with support only if requested.</div>
+        <div class="next-steps">
+          <div class="next-steps-title">Next Steps</div>
+          <div class="next-steps-content">
+            <ol>
+              <li><strong>Check your email</strong> for portal access credentials</li>
+              <li><strong>Log in to your portal</strong> using the provided URL and credentials</li>
+              <li><strong>Change your password</strong> when prompted during first login</li>
+              <li><strong>Configure your portal</strong> according to your organization's needs</li>
+            </ol>
+            <p>If you don't receive the email within 10 minutes, please check your spam folder or contact support.</p>
+          </div>
+        </div>
+
+        <button id="show-token-btn" type="button">Show Token for Support</button>
+        <div id="token-support-section">
+          <span style="color: #00B4E5;">Your AWS Marketplace Token:</span>
+          <pre id="aws-token">Loading...</pre>
+          <div style="font-size:0.8em; color:rgba(255,255,255,0.7); margin-top:8px;">Share this token with support only if requested.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -517,9 +591,6 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const showBtn = document.getElementById('show-token-btn');
-    const tokenSection = document.getElementById('token-support-section');
-    const tokenPre = document.getElementById('aws-token');
     const urlParams = new URLSearchParams(window.location.search);
     
     // Get parameters from URL
@@ -527,34 +598,144 @@
     const customerId = urlParams.get('customer');
     const productCode = urlParams.get('product');
     const tenantName = urlParams.get('tenant');
+    const step = urlParams.get('step');
     
-    // Set token
-    tokenPre.textContent = awsToken ? awsToken : 'Not provided';
+    // Show appropriate section based on step
+    const dnsSelectionSection = document.getElementById('dns-selection-section');
+    const completionSection = document.getElementById('completion-section');
     
-    // Show customer info if available
-    if (customerId || productCode || tenantName) {
-      document.getElementById('customer-info').style.display = 'block';
+    if (step === 'dns-selection') {
+      // Show DNS selection form
+      dnsSelectionSection.style.display = 'block';
+      completionSection.style.display = 'none';
       
-      if (customerId) {
-        document.getElementById('customer-id').textContent = customerId;
+      // Populate DNS section customer info
+      if (customerId || productCode) {
+        document.getElementById('dns-customer-info').style.display = 'block';
+        if (customerId) {
+          document.getElementById('dns-customer-id').textContent = customerId;
+        }
+        if (productCode) {
+          document.getElementById('dns-product-code').textContent = productCode;
+        }
       }
-      if (productCode) {
-        document.getElementById('product-code').textContent = productCode;
+      
+      // Set token for DNS section
+      document.getElementById('dns-aws-token').textContent = awsToken ? awsToken : 'Not provided';
+      
+      // DNS form logic
+      const dnsForm = document.getElementById('dns-form');
+      const dnsNameInput = document.getElementById('dns-name');
+      const previewUrl = document.getElementById('preview-url');
+      const provisionBtn = document.getElementById('provision-btn');
+      const formMessage = document.getElementById('dns-form-message');
+      
+      // Update preview URL as user types
+      dnsNameInput.addEventListener('input', function() {
+        const value = this.value || 'yourname';
+        previewUrl.textContent = value + '.use.azure.cterafs.com';
+      });
+      
+      // Handle form submission
+      dnsForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const dnsName = dnsNameInput.value.trim();
+        
+        if (!dnsName) {
+          formMessage.style.color = '#ff6b6b';
+          formMessage.textContent = 'Please enter a portal name';
+          return;
+        }
+        
+        if (dnsName.length < 3 || dnsName.length > 20) {
+          formMessage.style.color = '#ff6b6b';
+          formMessage.textContent = 'Portal name must be 3-20 characters';
+          return;
+        }
+        
+        // Disable button and show loading
+        provisionBtn.disabled = true;
+        provisionBtn.textContent = 'Creating Portal...';
+        formMessage.style.color = '#00B4E5';
+        formMessage.textContent = 'Provisioning your CTERA Portal...';
+        
+        // Call Lambda function to provision tenant
+        fetch('https://5vrhjgx1a0.execute-api.us-east-1.amazonaws.com/prod/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            action: 'provision',
+            customer: customerId,
+            product: productCode,
+            dnsName: dnsName
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            formMessage.style.color = '#00CDAF';
+            formMessage.textContent = 'Portal created successfully! Redirecting...';
+            
+            // Redirect to completion page
+            const completionUrl = new URL(window.location.href);
+            completionUrl.searchParams.set('step', 'complete');
+            completionUrl.searchParams.set('tenant', dnsName);
+            
+            setTimeout(() => {
+              window.location.href = completionUrl.toString();
+            }, 2000);
+          } else {
+            throw new Error(data.message || 'Failed to create portal');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          formMessage.style.color = '#ff6b6b';
+          formMessage.textContent = 'Error creating portal: ' + error.message;
+          provisionBtn.disabled = false;
+          provisionBtn.textContent = 'Create My Portal';
+        });
+      });
+      
+      // DNS section token button
+      document.getElementById('dns-show-token-btn').addEventListener('click', function() {
+        document.getElementById('dns-token-support-section').style.display = 'block';
+        this.style.display = 'none';
+      });
+      
+    } else {
+      // Show completion section
+      dnsSelectionSection.style.display = 'none';
+      completionSection.style.display = 'block';
+      
+      // Set token for completion section
+      document.getElementById('aws-token').textContent = awsToken ? awsToken : 'Not provided';
+      
+      // Show customer info if available
+      if (customerId || productCode || tenantName) {
+        document.getElementById('customer-info').style.display = 'block';
+        
+        if (customerId) {
+          document.getElementById('customer-id').textContent = customerId;
+        }
+        if (productCode) {
+          document.getElementById('product-code').textContent = productCode;
+        }
+        if (tenantName) {
+          document.getElementById('tenant-name').textContent = tenantName + '.use.azure.cterafs.com';
+        } else if (customerId) {
+          // Generate tenant name like the Lambda does
+          const generatedTenant = 'tenant-' + customerId.slice(-8);
+          document.getElementById('tenant-name').textContent = generatedTenant + '.use.azure.cterafs.com';
+        }
       }
-      if (tenantName) {
-        document.getElementById('tenant-name').textContent = tenantName + '.use.azure.cterafs.com';
-      } else if (customerId) {
-        // Generate tenant name like the Lambda does
-        const generatedTenant = 'tenant-' + customerId.slice(-8);
-        document.getElementById('tenant-name').textContent = generatedTenant + '.use.azure.cterafs.com';
-      }
+      
+      // Completion section token button
+      document.getElementById('show-token-btn').addEventListener('click', function() {
+        document.getElementById('token-support-section').style.display = 'block';
+        this.style.display = 'none';
+      });
     }
-    
-    // Show token button functionality
-    showBtn.addEventListener('click', function() {
-      tokenSection.style.display = 'block';
-      showBtn.style.display = 'none';
-    });
   });
 </script>
 
