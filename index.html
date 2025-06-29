@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <title>CTERA File Services Platform - AWS Marketplace Fulfillment</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 400;
+    }
+
+    body {
+      background-color: #0f2342;
+      color: white;
+      display: grid;
+      grid-template-columns: 1fr min(113rem, 100%) 1fr;
+      flex: 1;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    header, .maincontainer, .footer-container {
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      grid-column: 2;
+      background-color: rgba(15, 35, 66, 0.95) !important;
+      padding: 8px 0 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: white !important;
+      height: 65px !important;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: none !important;
+      border-bottom: none !important;
+      border-top: none !important;
+    }
+
+    .header-content {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      width: 100% !important;
+      max-width: 1400px !important;
+      margin: 0 auto !important;
+      padding: 0 50px !important;
+    }
+
+    header img {
+      max-height: 45px !important;
+      vertical-align: middle !important;
+    }
+
+    .header-buttons {
+      display: flex !important;
+      gap: 16px !important;
+      justify-content: center !important;
+      align-items: center !important;
+    }
+
+    .header-buttons a {
+      text-decoration: none !important;
+      color: white !important;
+      font-size: 0.75em !important;
+      font-family: 'Montserrat', Arial, sans-serif !important;
+      font-weight: 300 !important;
+      transition: color 0.3s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .header-buttons a:hover {
+      color: #00B4E5 !important;
+    }
+
+    #portal-title {
+      color: white !important;
+      margin: 10px 0 !important;
+      text-align: left !important;
+    }
+
+    .maincontainer {
+      flex: 1;
+      grid-column: 2;
+      padding: 40px !important;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .subscription-details {
+      max-width: 800px;
+      margin-bottom: 40px;
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 15px;
+      font-size: 0.9em;
+      gap: 40px;
+    }
+
+    .detail-label {
+      min-width: 180px;
+      color: #00B4E5;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .detail-value {
+      color: white;
+      flex: 1;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 400;
+      word-break: break-all;
+    }
+
+    .footer-container {
+      grid-column: 1 / span 3;
+      background-color: rgba(15, 35, 66, 0.95);
+      width: 100%;
+      height: 40px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 60px;
+      font-size: 0.7em;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 400;
+    }
+
+    .footer-left {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .footer-right {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    #activate-button {
+      margin: 40px auto;
+      background-color: #F39200;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 4px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: block;
+    }
+
+    #activate-button:hover {
+      background-color: #ff9900;
+    }
+
+    #activate-button:disabled {
+      background-color: rgba(243, 146, 0, 0.3);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .saas-header {
+      color: white;
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 600;
+      padding: 0;
+    }
+
+    .status-text {
+      font-size: 0.9em;
+      width: 100%;
+      max-width: 800px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      overflow-wrap: break-word;
+      background-color: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    .saas-address {
+      font-size: 0.9em;
+      width: 100%;
+      max-width: 800px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      overflow-wrap: break-word;
+      background-color: rgba(255, 255, 255, 0.05);
+      color: #00CDAF;
+    }
+
+    .subscription-heading, .saas-header {
+      color: white;
+      font-size: 1em;
+      margin-bottom: 20px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0.2px;
+    }
+
+    .loading-container {
+      text-align: center;
+      padding: 40px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .loading-title {
+      color: #00B4E5;
+      font-size: 24px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .loading-message {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 16px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    .loading-spinner {
+      width: 30px;
+      height: 30px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-top: 2px solid rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto 0;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .footer-right a {
+      color: #00B4E5;
+      text-decoration: none;
+    }
+
+    .footer-right a:hover {
+      text-decoration: underline;
+    }
+
+    .activation-description {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.75em;
+      margin: 20px auto 15px;
+      max-width: 600px;
+      line-height: 1.4;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 400;
+    }
+
+    .section-container {
+      margin-bottom: 40px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Hidden token section */
+    #token-support-section {
+      display: none;
+      margin-top: 20px;
+    }
+
+    #show-token-btn {
+      margin-top: 30px;
+      background: #00B4E5;
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 4px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #show-token-btn:hover {
+      background: #0099c6;
+    }
+
+    #aws-token {
+      color: #fff;
+      background: rgba(0,0,0,0.2);
+      padding: 10px;
+      border-radius: 6px;
+      word-break: break-all;
+      font-size: 0.95em;
+    }
+  </style>  
+</head>
+
+<body>
+  <header>
+    <div class="header-content">
+      <img src="logo.png" alt="CTERA Logo">
+      <div class="header-buttons">
+        <a href="https://www.ctera.com/company/contact/" target="_blank">CONTACT US</a>
+        <a href="https://www.ctera.com/support/" target="_blank">SUPPORT CENTER</a>
+        <a href="https://kb.ctera.com/" target="_blank">KNOWLEDGE BASE</a>
+      </div>
+    </div>
+  </header>
+  
+  <div class="maincontainer">
+    <div id="dns-form-section" style="display:none; max-width:400px; margin:0 auto 30px auto;">
+      <h3 style="color:#00B4E5;">Choose your portal address</h3>
+      <form id="dns-form">
+        <label for="dns-name">Desired DNS name:</label>
+        <input type="text" id="dns-name" name="dns-name" required placeholder="e.g. mycompany" style="width:100%;margin-bottom:10px;">
+        <button type="submit">Reserve & Register</button>
+      </form>
+      <div id="dns-form-message" style="margin-top:10px;"></div>
+    </div>
+    <div class="loading-container">
+      <h2 class="loading-title">Thank You for Subscribing via AWS Marketplace!</h2>
+      <p class="loading-message">
+        We are provisioning your CTERA Portal.<br>
+        You will receive an email with your access details soon.<br>
+        <br>
+        <strong>If you have any questions, please contact our support team.</strong>
+      </p>
+      <button id="show-token-btn" type="button">Show Token for Support</button>
+      <div id="token-support-section">
+        <span style="color: #00B4E5;">Your AWS Marketplace Token:</span>
+        <pre id="aws-token">Loading...</pre>
+        <div style="font-size:0.8em; color:rgba(255,255,255,0.7); margin-top:8px;">Share this token with support only if requested.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-container">
+    <div class="footer-content">
+      <div class="footer-left">
+        © 2025 CTERA Networks Ltd. All Rights Reserved
+      </div>
+      <div class="footer-right">
+        | Contact our Support Team at  <a href='mailto:support@ctera.com'>CTERA Support</a> | <a href='https://www.ctera.com/eula/'>EULA</a> 
+      </div>
+    </div>
+  </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const showBtn = document.getElementById('show-token-btn');
+    const tokenSection = document.getElementById('token-support-section');
+    const tokenPre = document.getElementById('aws-token');
+    const urlParams = new URLSearchParams(window.location.search);
+    const awsToken = urlParams.get('x-amzn-marketplace-token') || urlParams.get('token');
+    tokenPre.textContent = awsToken ? awsToken : 'Not provided';
+    showBtn.addEventListener('click', function() {
+      tokenSection.style.display = 'block';
+      showBtn.style.display = 'none';
+    });
+
+    // DNS form logic
+    const dnsFormSection = document.getElementById('dns-form-section');
+    if (awsToken) {
+      dnsFormSection.style.display = 'block';
+      const dnsForm = document.getElementById('dns-form');
+      dnsForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const dnsName = document.getElementById('dns-name').value;
+        // TODO: Replace with your actual registration endpoint URL
+        fetch('https://5vrhjgx1a0.execute-api.us-east-1.amazonaws.com/prod/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: awsToken, dnsName })
+        })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('dns-form-message').textContent = data.message || 'Registration submitted!';
+        })
+        .catch(() => {
+          document.getElementById('dns-form-message').textContent = 'Error submitting registration.';
+        });
+      });
+    }
+  });
+</script>
+
+</body>
+
+</html>
