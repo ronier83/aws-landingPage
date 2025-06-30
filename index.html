@@ -441,7 +441,7 @@
 <body>
   <header>
     <div class="header-content">
-      <img src="logo.png" alt="CTERA Logo">
+      <img src="https://mango-dune-0553c520f.5.azurestaticapps.net/logo.png" alt="CTERA Logo">
       <div class="header-buttons">
         <a href="https://www.ctera.com/company/contact/" target="_blank">CONTACT US</a>
         <a href="https://www.ctera.com/support/" target="_blank">SUPPORT CENTER</a>
@@ -568,7 +568,7 @@
             <span class="customer-value" id="tenant-name">Loading...</span>
           </div>
           <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 8px; font-style: italic;">
-            * Portal URL is auto-generated based on your AWS customer ID
+            * Portal URL is based on the DNS name you selected
           </div>
         </div>
 
@@ -749,10 +749,6 @@
         }
         if (tenantName) {
           document.getElementById('tenant-name').textContent = tenantName + '.use.azure.cterafs.com';
-        } else if (customerId) {
-          // Generate tenant name like the Lambda does
-          const generatedTenant = 'tenant-' + customerId.slice(-8);
-          document.getElementById('tenant-name').textContent = generatedTenant + '.use.azure.cterafs.com';
         }
       }
       
