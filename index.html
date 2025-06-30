@@ -451,6 +451,99 @@
   </header>
   
   <div class="maincontainer">
+    <!-- Registration Complete Section (shown when step=registration-complete) -->
+    <div id="registration-complete-section" style="display: none;">
+      <div class="loading-container">
+        <h2 class="loading-title">✅ AWS Marketplace Registration Complete</h2>
+        <p class="loading-message">
+          Your AWS Marketplace subscription has been successfully registered with CTERA.<br>
+          If you have not received your portal credentials via email, please contact CTERA support.
+        </p>
+        
+        <div class="success-message">
+          <div class="success-title">What Should Happen Next</div>
+          <div class="success-details">
+            <ol>
+              <li><strong>Check your email</strong> for CTERA portal access credentials</li>
+              <li><strong>Check your spam folder</strong> if you don't see the email</li>
+              <li><strong>Contact CTERA support</strong> if you haven't received credentials within 10 minutes</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="customer-info" id="reg-customer-info" style="display: none;">
+          <div class="customer-info-title">Your Subscription Details</div>
+          <div class="customer-detail">
+            <span class="customer-label">Customer ID:</span>
+            <span class="customer-value" id="reg-customer-id">Loading...</span>
+          </div>
+          <div class="customer-detail">
+            <span class="customer-label">Product Code:</span>
+            <span class="customer-value" id="reg-product-code">Loading...</span>
+          </div>
+          <div class="customer-detail">
+            <span class="customer-label">Status:</span>
+            <span class="customer-value" style="color: #00CDAF;">REGISTERED</span>
+          </div>
+        </div>
+
+        <div class="next-steps">
+          <div class="next-steps-title">Need Help? Contact CTERA Support</div>
+          <div class="next-steps-content">
+            <p><strong>If you haven't received your portal credentials or need assistance:</strong></p>
+            <ul>
+              <li>Email: <a href="mailto:support@ctera.com" style="color: #00B4E5;">support@ctera.com</a></li>
+              <li>Include your Customer ID and Product Code (shown above) in your message</li>
+              <li>Mention that you completed AWS Marketplace registration but need portal access</li>
+            </ul>
+            <p style="margin-top: 15px; font-size: 13px; color: rgba(255,255,255,0.7);">
+              Our support team will verify your subscription and ensure you receive your portal credentials promptly.
+            </p>
+          </div>
+        </div>
+
+        <button id="reg-show-token-btn" type="button" style="margin-top: 30px; background: #00B4E5; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-family: 'Montserrat', Arial, sans-serif; font-weight: 500; cursor: pointer; transition: background 0.3s;">
+          Show Details for Support
+        </button>
+        <div id="reg-token-support-section" style="display: none; margin-top: 20px;">
+          <span style="color: #00B4E5;">Additional Details for Support:</span>
+          <pre id="reg-aws-token" style="color: #fff; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; word-break: break-all; font-size: 0.95em;">Loading...</pre>
+          <div style="font-size:0.8em; color:rgba(255,255,255,0.7); margin-top:8px;">Share these details with CTERA support if they request additional information about your subscription.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Section (shown when error parameter is present) -->
+    <div id="error-section" style="display: none;">
+      <div class="loading-container">
+        <h2 class="loading-title" style="color: #ff6b6b;">❌ Registration Error</h2>
+        <p class="loading-message" id="error-message">
+          There was an error processing your AWS Marketplace registration.
+        </p>
+        
+        <div class="next-steps" style="border-color: rgba(255, 107, 107, 0.3); background-color: rgba(255, 107, 107, 0.1);">
+          <div class="next-steps-title" style="color: #ff6b6b;">What to do next:</div>
+          <div class="next-steps-content">
+            <ol>
+              <li><strong>Try subscribing again</strong> from AWS Marketplace</li>
+              <li><strong>Check your subscription status</strong> in the AWS Marketplace console</li>
+              <li><strong>Contact support</strong> if the problem persists</li>
+            </ol>
+            <p>You can also share the error details below with our support team for faster assistance.</p>
+          </div>
+        </div>
+
+        <button id="error-show-details-btn" type="button" style="margin-top: 30px; background: #ff6b6b; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-family: 'Montserrat', Arial, sans-serif; font-weight: 500; cursor: pointer; transition: background 0.3s;">
+          Show Error Details
+        </button>
+        <div id="error-details-section" style="display: none; margin-top: 20px;">
+          <span style="color: #ff6b6b;">Error Details:</span>
+          <pre id="error-details" style="color: #fff; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; word-break: break-all; font-size: 0.95em;">Loading...</pre>
+          <div style="font-size:0.8em; color:rgba(255,255,255,0.7); margin-top:8px;">Share these details with support for faster assistance.</div>
+        </div>
+      </div>
+    </div>
+
     <!-- DNS Selection Section (shown when step=dns-selection) -->
     <div id="dns-selection-section" style="display: none;">
       <div class="loading-container">
@@ -616,15 +709,67 @@
     const productCode = urlParams.get('product');
     const tenantName = urlParams.get('tenant');
     const step = urlParams.get('step');
+    const error = urlParams.get('error');
+    const errorMessage = urlParams.get('message');
     
-    // Show appropriate section based on step
+    // Show appropriate section based on step or error
+    const registrationCompleteSection = document.getElementById('registration-complete-section');
+    const errorSection = document.getElementById('error-section');
     const dnsSelectionSection = document.getElementById('dns-selection-section');
     const completionSection = document.getElementById('completion-section');
     
-    if (step === 'dns-selection') {
+    // Hide all sections initially
+    registrationCompleteSection.style.display = 'none';
+    errorSection.style.display = 'none';
+    dnsSelectionSection.style.display = 'none';
+    completionSection.style.display = 'none';
+    
+    if (error) {
+      // Show error section
+      errorSection.style.display = 'block';
+      
+      // Set error message
+      const errorMessageEl = document.getElementById('error-message');
+      if (errorMessage) {
+        errorMessageEl.textContent = decodeURIComponent(errorMessage);
+      }
+      
+      // Set error details
+      document.getElementById('error-details').textContent = `Error: ${error}\nMessage: ${errorMessage || 'No additional details'}`;
+      
+      // Error show details button
+      document.getElementById('error-show-details-btn').addEventListener('click', function() {
+        document.getElementById('error-details-section').style.display = 'block';
+        this.style.display = 'none';
+      });
+      
+    } else if (step === 'registration-complete') {
+      // Show registration complete section
+      registrationCompleteSection.style.display = 'block';
+      
+      // Populate registration section customer info
+      if (customerId || productCode) {
+        document.getElementById('reg-customer-info').style.display = 'block';
+        if (customerId) {
+          document.getElementById('reg-customer-id').textContent = customerId;
+        }
+        if (productCode) {
+          document.getElementById('reg-product-code').textContent = productCode;
+        }
+      }
+      
+      // Set token for registration section
+      document.getElementById('reg-aws-token').textContent = awsToken ? awsToken : 'Not provided';
+      
+      // Registration section token button
+      document.getElementById('reg-show-token-btn').addEventListener('click', function() {
+        document.getElementById('reg-token-support-section').style.display = 'block';
+        this.style.display = 'none';
+      });
+      
+         } else if (step === 'dns-selection') {
       // Show DNS selection form
       dnsSelectionSection.style.display = 'block';
-      completionSection.style.display = 'none';
       
       // Populate DNS section customer info
       if (customerId || productCode) {
@@ -730,8 +875,7 @@
       });
       
     } else {
-      // Show completion section
-      dnsSelectionSection.style.display = 'none';
+      // Show completion section (default case)
       completionSection.style.display = 'block';
       
       // Set token for completion section
