@@ -454,10 +454,10 @@
     <!-- DNS Selection Section (shown when step=dns-selection) -->
     <div id="dns-selection-section" style="display: none;">
       <div class="loading-container">
-        <h2 class="loading-title">Choose Your Portal Address</h2>
+        <h2 class="loading-title">Setup Your CTERA Portal</h2>
         <p class="loading-message">
-          Please choose a unique name for your CTERA Portal.<br>
-          This will be your portal's web address.
+          Please provide your email address and choose a unique name for your CTERA Portal.<br>
+          We'll send your portal credentials to your email once setup is complete.
         </p>
         
         <div class="customer-info" id="dns-customer-info" style="display: none;">
@@ -474,6 +474,23 @@
 
         <div style="max-width: 500px; margin: 30px auto;">
           <form id="dns-form">
+            <div style="margin-bottom: 20px;">
+              <label for="customer-email" style="display: block; color: #00B4E5; font-weight: 600; margin-bottom: 8px;">
+                Email Address:
+              </label>
+              <input 
+                type="email" 
+                id="customer-email" 
+                name="customer-email" 
+                required 
+                placeholder="your-email@company.com"
+                style="width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; background: rgba(255,255,255,0.1); color: white; font-size: 16px; box-sizing: border-box;"
+              >
+              <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 5px;">
+                Portal credentials will be sent to this email address
+              </div>
+            </div>
+            
             <div style="margin-bottom: 20px;">
               <label for="dns-name" style="display: block; color: #00B4E5; font-weight: 600; margin-bottom: 8px;">
                 Choose Portal Name:
@@ -531,8 +548,8 @@
         <div class="success-message">
           <div class="success-title">✓ Provisioning Complete</div>
           <div class="success-details">
-            Your CTERA Portal tenant has been created and configured with an automatically assigned URL.<br>
-            <strong>You will receive an email shortly</strong> with your portal URL and login credentials.
+            Your CTERA Portal tenant has been created and configured with your chosen DNS name.<br>
+            <strong>You will receive an email shortly</strong> with your portal URL and login credentials at the email address you provided.
           </div>
         </div>
 
@@ -640,6 +657,13 @@
       dnsForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const dnsName = dnsNameInput.value.trim();
+        const customerEmail = document.getElementById('customer-email').value.trim();
+        
+        if (!customerEmail) {
+          formMessage.style.color = '#ff6b6b';
+          formMessage.textContent = 'Please enter a valid email address';
+          return;
+        }
         
         if (!dnsName) {
           formMessage.style.color = '#ff6b6b';
@@ -667,7 +691,8 @@
             action: 'provision',
             customer: customerId,
             product: productCode,
-            dnsName: dnsName
+            dnsName: dnsName,
+            email: customerEmail
           })
         })
         .then(res => res.json())
