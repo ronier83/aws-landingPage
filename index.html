@@ -692,7 +692,8 @@
             customer: customerId,
             product: productCode,
             dnsName: dnsName,
-            email: customerEmail
+            email: customerEmail,
+            token: awsToken  // Include the marketplace token for proper fulfillment
           })
         })
         .then(res => res.json())
