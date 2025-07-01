@@ -16,7 +16,8 @@ window.UI = {
       registrationComplete: document.getElementById('registration-complete-section'),
       error: document.getElementById('error-section'),
       dnsSelection: document.getElementById('dns-selection-section'),
-      completion: document.getElementById('completion-section')
+      completion: document.getElementById('completion-section'),
+      noSubscription: document.getElementById('no-subscription-section')
     };
     
     // Hide all sections initially
@@ -31,6 +32,9 @@ window.UI = {
       this.showRegistrationCompleteSection(params, sections.registrationComplete);
     } else if (params.step === 'dns-selection') {
       this.showDnsSelectionSection(params, sections.dnsSelection);
+    } else if (!params.awsToken && !params.customerId && !params.productCode) {
+      // No valid AWS marketplace parameters - show guidance instead of misleading success
+      this.showNoSubscriptionSection(sections.noSubscription, sections.completion);
     } else {
       this.showCompletionSection(params, sections.completion);
     }
@@ -106,6 +110,87 @@ window.UI = {
     
     // Initialize DNS form functionality
     this.initializeDnsForm(params);
+  },
+  
+  /**
+   * Show no subscription section when no valid AWS marketplace parameters are present
+   */
+  showNoSubscriptionSection(noSubscriptionSection, completionSection) {
+    console.log('UI: No valid AWS marketplace parameters detected');
+    
+    if (noSubscriptionSection) {
+      // Show dedicated no-subscription section if it exists
+      noSubscriptionSection.style.display = 'block';
+      CteraApp.state.currentSection = 'no-subscription';
+    } else if (completionSection) {
+      // Fallback: modify completion section to show appropriate message
+      completionSection.style.display = 'block';
+      CteraApp.state.currentSection = 'no-subscription-fallback';
+      this.modifyCompletionForNoSubscription(completionSection);
+    }
+  },
+  
+  /**
+   * Modify completion section content for no subscription case
+   */
+  modifyCompletionForNoSubscription(section) {
+    const titleEl = section.querySelector('.loading-title');
+    const messageEl = section.querySelector('.loading-message');
+    const successMessageEl = section.querySelector('.success-message');
+    const customerInfoEl = section.querySelector('#customer-info');
+    const nextStepsEl = section.querySelector('.next-steps');
+    
+    if (titleEl) {
+      titleEl.textContent = '🔗 CTERA File Services Platform';
+      titleEl.style.color = '#F39200'; // Orange instead of blue
+    }
+    
+    if (messageEl) {
+      messageEl.innerHTML = 'To access CTERA File Services Platform, you need to subscribe through AWS Marketplace.<br>This page is designed for AWS Marketplace subscription fulfillment.';
+    }
+    
+    if (successMessageEl) {
+      successMessageEl.innerHTML = `
+        <div class="success-title" style="color: #F39200;">🚀 Get Started with CTERA</div>
+        <div class="success-details">
+          <ol>
+            <li><strong>Visit AWS Marketplace</strong> to browse CTERA offerings</li>
+            <li><strong>Subscribe to CTERA File Services Platform</strong></li>
+            <li><strong>Complete the subscription process</strong> - you'll be redirected back here</li>
+            <li><strong>Set up your portal</strong> using the guided process</li>
+          </ol>
+          <p style="margin-top: 15px;">
+            <a href="https://aws.amazon.com/marketplace/search/results?searchTerms=ctera" target="_blank" 
+               style="color: #00B4E5; text-decoration: none; font-weight: 600;">
+              → Browse CTERA on AWS Marketplace
+            </a>
+          </p>
+        </div>
+      `;
+    }
+    
+    // Hide customer info section since there's no subscription
+    if (customerInfoEl) {
+      customerInfoEl.style.display = 'none';
+    }
+    
+    // Update next steps section
+    if (nextStepsEl) {
+      nextStepsEl.innerHTML = `
+        <div class="next-steps-title">Need Help?</div>
+        <div class="next-steps-content">
+          <p><strong>For questions about CTERA File Services Platform:</strong></p>
+          <ul>
+            <li>Email: <a href="mailto:support@ctera.com" style="color: #00B4E5;">support@ctera.com</a></li>
+            <li>Visit: <a href="https://www.ctera.com/" target="_blank" style="color: #00B4E5;">CTERA.com</a></li>
+            <li>Documentation: <a href="https://kb.ctera.com/" target="_blank" style="color: #00B4E5;">Knowledge Base</a></li>
+          </ul>
+          <p style="margin-top: 15px; font-size: 13px; color: rgba(255,255,255,0.7);">
+            If you believe you should have access, please contact support with details about your AWS subscription.
+          </p>
+        </div>
+      `;
+    }
   },
   
   /**
