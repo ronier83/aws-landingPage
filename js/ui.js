@@ -31,7 +31,14 @@ window.UI = {
     } else if (params.step === 'registration-complete') {
       this.showRegistrationCompleteSection(params, sections.registrationComplete);
     } else if (params.step === 'dns-selection') {
-      this.showDnsSelectionSection(params, sections.dnsSelection);
+      // Check if this customer might already be registered based on Lambda deduplication expectations
+      if (params.customerId && params.productCode && params.awsToken) {
+        // This customer should have been caught by Lambda deduplication
+        // Show warning instead of DNS form to prevent duplicate portal creation
+        this.showDuplicateCustomerWarning(params, sections.registrationComplete);
+      } else {
+        this.showDnsSelectionSection(params, sections.dnsSelection);
+      }
     } else if (!params.awsToken && !params.customerId && !params.productCode) {
       // No valid AWS marketplace parameters - show guidance instead of misleading success
       this.showNoSubscriptionSection(sections.noSubscription, sections.completion);
@@ -86,6 +93,84 @@ window.UI = {
     setAwsToken('reg-aws-token', params.awsToken);
   },
   
+  /**
+   * Show warning for customers who already have portals (duplicate prevention)
+   */
+  showDuplicateCustomerWarning(params, section) {
+    if (!section) return;
+    
+    console.log('UI: Showing duplicate customer warning for:', params.customerId);
+    section.style.display = 'block';
+    CteraApp.state.currentSection = 'duplicate-customer';
+    
+    // Modify section title and content using correct selectors
+    const titleEl = section.querySelector('.loading-title');
+    if (titleEl) {
+      titleEl.innerHTML = '⚠️ Portal Already Exists';
+      titleEl.style.color = '#F39200'; // Orange warning color
+    }
+    
+    // Modify main message
+    const messageEl = section.querySelector('.loading-message');
+    if (messageEl) {
+      messageEl.innerHTML = `
+        A CTERA Portal has already been created for this AWS Marketplace subscription.<br>
+        <strong>Customer ID ${params.customerId}</strong> already has an active portal.
+      `;
+    }
+    
+    // Modify success message section
+    const successMessageEl = section.querySelector('.success-message');
+    if (successMessageEl) {
+      successMessageEl.innerHTML = `
+        <div class="success-title" style="color: #F39200;">What Should You Do?</div>
+        <div class="success-details">
+          <ol>
+            <li><strong>Check your email</strong> for the original portal credentials</li>
+            <li><strong>Search for "CTERA"</strong> in your email inbox and spam folder</li>
+            <li><strong>Contact support</strong> if you can't find your portal access</li>
+          </ol>
+          <p style="margin-top: 15px; padding: 10px; background: rgba(243, 146, 0, 0.1); border-left: 3px solid #F39200; border-radius: 4px;">
+            <strong>Important:</strong> Multiple portals cannot be created for the same AWS Marketplace subscription. 
+            If you need additional portals, please contact CTERA support.
+          </p>
+        </div>
+      `;
+    }
+    
+    // Show customer info
+    const customerInfoEl = document.getElementById('reg-customer-info');
+    if (customerInfoEl) {
+      customerInfoEl.style.display = 'block';
+      populateCustomerInfo('reg', params);
+    }
+    
+    // Set AWS token for support
+    setAwsToken('reg-aws-token', params.awsToken);
+    
+    // Modify next steps section to show support information
+    const nextStepsEl = section.querySelector('.next-steps');
+    if (nextStepsEl) {
+      nextStepsEl.innerHTML = `
+        <div class="next-steps-title">Need Your Portal Access?</div>
+        <div class="next-steps-content">
+          <p><strong>Contact CTERA Support with these details:</strong></p>
+          <ul>
+            <li>Customer ID: <strong>${params.customerId}</strong></li>
+            <li>Product Code: <strong>${params.productCode}</strong></li>
+            <li>Issue: "Need access to existing portal"</li>
+          </ul>
+          <p style="margin-top: 15px;">
+            Email: <a href="mailto:support@ctera.com?subject=Portal Access Request - Customer ${params.customerId}&body=Hi CTERA Support,%0A%0AI need access to my existing CTERA portal.%0A%0ACustomer ID: ${params.customerId}%0AProduct Code: ${params.productCode}%0A%0APlease send me the portal URL and help with login credentials.%0A%0AThank you!" style="color: #00B4E5;">support@ctera.com</a>
+          </p>
+          <p style="margin-top: 10px; font-size: 13px; color: rgba(255,255,255,0.7);">
+            Our support team will help you access your existing portal.
+          </p>
+        </div>
+      `;
+    }
+  },
+
   /**
    * Show and configure DNS selection section
    */
