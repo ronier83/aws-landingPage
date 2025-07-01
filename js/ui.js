@@ -212,8 +212,17 @@ window.UI = {
       if (customerInfoEl) {
         customerInfoEl.style.display = 'block';
         
-        // Populate customer info
-        populateCustomerInfo('', params);
+        // Populate customer info - completion section has NO prefix
+        const customerIdEl = document.getElementById('customer-id');
+        const productCodeEl = document.getElementById('product-code');
+        
+        if (customerIdEl && params.customerId) {
+          customerIdEl.textContent = params.customerId;
+        }
+        
+        if (productCodeEl && params.productCode) {
+          productCodeEl.textContent = params.productCode;
+        }
         
         // Set tenant name if available
         const tenantNameEl = document.getElementById('tenant-name');
