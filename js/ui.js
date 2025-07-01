@@ -113,19 +113,28 @@ window.UI = {
     // Modify main message
     const messageEl = section.querySelector('.loading-message');
     if (messageEl) {
+      const portalInfo = params.portal ? 
+        `<br><strong>Portal URL:</strong> <a href="https://${params.portal}.use.azure.cterafs.com" target="_blank" style="color: #00B4E5;">${params.portal}.use.azure.cterafs.com</a>` : 
+        '';
+      
       messageEl.innerHTML = `
         A CTERA Portal has already been created for this AWS Marketplace subscription.<br>
-        <strong>Customer ID ${params.customerId}</strong> already has an active portal.
+        <strong>Customer ID ${params.customerId}</strong> already has an active portal.${portalInfo}
       `;
     }
     
     // Modify success message section
     const successMessageEl = section.querySelector('.success-message');
     if (successMessageEl) {
+      const portalAccessInfo = params.portal ? 
+        `<li><strong>Access your existing portal:</strong> <a href="https://${params.portal}.use.azure.cterafs.com" target="_blank" style="color: #00B4E5;">${params.portal}.use.azure.cterafs.com</a></li>` : 
+        '';
+      
       successMessageEl.innerHTML = `
         <div class="success-title" style="color: #F39200;">What Should You Do?</div>
         <div class="success-details">
           <ol>
+            ${portalAccessInfo}
             <li><strong>Check your email</strong> for the original portal credentials</li>
             <li><strong>Search for "CTERA"</strong> in your email inbox and spam folder</li>
             <li><strong>Contact support</strong> if you can't find your portal access</li>
@@ -151,6 +160,14 @@ window.UI = {
     // Modify next steps section to show support information
     const nextStepsEl = section.querySelector('.next-steps');
     if (nextStepsEl) {
+      const portalNameInfo = params.portal ? 
+        `<li>Portal Name: <strong>${params.portal}</strong></li>` : 
+        '';
+      
+      const emailBody = params.portal ? 
+        `Hi CTERA Support,%0A%0AI need access to my existing CTERA portal.%0A%0ACustomer ID: ${params.customerId}%0AProduct Code: ${params.productCode}%0APortal Name: ${params.portal}%0APortal URL: ${params.portal}.use.azure.cterafs.com%0A%0APlease help me with login credentials.%0A%0AThank you!` :
+        `Hi CTERA Support,%0A%0AI need access to my existing CTERA portal.%0A%0ACustomer ID: ${params.customerId}%0AProduct Code: ${params.productCode}%0A%0APlease send me the portal URL and help with login credentials.%0A%0AThank you!`;
+      
       nextStepsEl.innerHTML = `
         <div class="next-steps-title">Need Your Portal Access?</div>
         <div class="next-steps-content">
@@ -158,10 +175,11 @@ window.UI = {
           <ul>
             <li>Customer ID: <strong>${params.customerId}</strong></li>
             <li>Product Code: <strong>${params.productCode}</strong></li>
+            ${portalNameInfo}
             <li>Issue: "Need access to existing portal"</li>
           </ul>
           <p style="margin-top: 15px;">
-            Email: <a href="mailto:support@ctera.com?subject=Portal Access Request - Customer ${params.customerId}&body=Hi CTERA Support,%0A%0AI need access to my existing CTERA portal.%0A%0ACustomer ID: ${params.customerId}%0AProduct Code: ${params.productCode}%0A%0APlease send me the portal URL and help with login credentials.%0A%0AThank you!" style="color: #00B4E5;">support@ctera.com</a>
+            Email: <a href="mailto:support@ctera.com?subject=Portal Access Request - Customer ${params.customerId}&body=${emailBody}" style="color: #00B4E5;">support@ctera.com</a>
           </p>
           <p style="margin-top: 10px; font-size: 13px; color: rgba(255,255,255,0.7);">
             Our support team will help you access your existing portal.

@@ -25,6 +25,7 @@ function parseUrlParameters() {
     customerId: urlParams.get('customer'),
     productCode: urlParams.get('product'),
     tenantName: urlParams.get('tenant'),
+    portal: urlParams.get('portal'),
     step: urlParams.get('step'),
     error: urlParams.get('error'),
     errorMessage: urlParams.get('message')
