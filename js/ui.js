@@ -31,14 +31,8 @@ window.UI = {
     } else if (params.step === 'registration-complete') {
       this.showRegistrationCompleteSection(params, sections.registrationComplete);
     } else if (params.step === 'dns-selection') {
-      // Check if this customer might already be registered based on Lambda deduplication expectations
-      if (params.customerId && params.productCode && params.awsToken) {
-        // This customer should have been caught by Lambda deduplication
-        // Show warning instead of DNS form to prevent duplicate portal creation
-        this.showDuplicateCustomerWarning(params, sections.registrationComplete);
-      } else {
-        this.showDnsSelectionSection(params, sections.dnsSelection);
-      }
+      // Always show DNS selection form - let Lambda handle deduplication based on actual DynamoDB state
+      this.showDnsSelectionSection(params, sections.dnsSelection);
     } else if (!params.awsToken && !params.customerId && !params.productCode) {
       // No valid AWS marketplace parameters - show guidance instead of misleading success
       this.showNoSubscriptionSection(sections.noSubscription, sections.completion);
