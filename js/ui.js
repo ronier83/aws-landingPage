@@ -33,6 +33,9 @@ window.UI = {
     } else if (params.step === 'dns-selection') {
       // Always show DNS selection form - let Lambda handle deduplication based on actual DynamoDB state
       this.showDnsSelectionSection(params, sections.dnsSelection);
+    } else if (params.step === 'complete') {
+      // Portal creation completed successfully - show completion page
+      this.showCompletionSection(params, sections.completion);
     } else if (!params.awsToken && !params.customerId && !params.productCode) {
       // No valid AWS marketplace parameters - show guidance instead of misleading success
       this.showNoSubscriptionSection(sections.noSubscription, sections.completion);
