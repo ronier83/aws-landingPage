@@ -16,6 +16,7 @@ window.UI = {
     const sections = {
       registrationComplete: document.getElementById('registration-complete-section'),
       error: document.getElementById('error-section'),
+      unsubscribed: document.getElementById('unsubscribed-section'),
       dnsSelection: document.getElementById('dns-selection-section'),
       completion: document.getElementById('completion-section'),
       noSubscription: document.getElementById('no-subscription-section')
@@ -27,7 +28,9 @@ window.UI = {
     });
     
     // Show appropriate section based on parameters
-    if (params.error) {
+    if (params.error === 'UNSUBSCRIBED') {
+      this.showUnsubscribedStatus(params, sections.unsubscribed);
+    } else if (params.error) {
       this.showErrorSection(params, sections.error);
     } else if (params.step === 'registration-complete') {
       this.showRegistrationCompleteSection(params, sections.registrationComplete);
@@ -121,6 +124,18 @@ window.UI = {
         this.showDnsSelectionSection(params, sections.dnsSelection);
         break;
         
+      case 'UNSUBSCRIBED':
+        // Customer subscription was cancelled - show unsubscribed section
+        const unsubscribedParams = {
+          ...params,
+          error: 'UNSUBSCRIBED',
+          // Extract additional data from the response
+          deletionDate: data.deletion_date,
+          portal: data.portal_name || data.portal || params.portal
+        };
+        this.showUnsubscribedStatus(unsubscribedParams, sections.unsubscribed);
+        break;
+        
       default:
         // Unknown status - show error
         const errorParams = {
@@ -152,6 +167,63 @@ window.UI = {
     const errorDetailsEl = document.getElementById('error-details');
     if (errorDetailsEl) {
       errorDetailsEl.textContent = `Error: ${params.error}\nMessage: ${params.errorMessage || 'No additional details'}`;
+    }
+  },
+
+  /**
+   * Show and configure unsubscribed section for cancelled subscriptions
+   */
+  showUnsubscribedStatus(params, section) {
+    if (!section) return;
+    
+    console.log('UI: Showing unsubscribed section');
+    section.style.display = 'block';
+    CteraApp.state.currentSection = 'unsubscribed';
+    
+    // Set deletion date if available
+    const deletionDateEl = document.getElementById('unsubscribed-deletion-date');
+    if (deletionDateEl) {
+      if (params.deletionDate) {
+        // Format the date nicely
+        const date = new Date(params.deletionDate);
+        deletionDateEl.textContent = date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } else {
+        deletionDateEl.textContent = 'Not available';
+      }
+    }
+    
+    // Populate customer information
+    const customerIdEl = document.getElementById('unsubscribed-customer-id');
+    const productCodeEl = document.getElementById('unsubscribed-product-code');
+    const portalNameEl = document.getElementById('unsubscribed-portal-name');
+    
+    if (customerIdEl && params.customerId) {
+      customerIdEl.textContent = params.customerId;
+    }
+    
+    if (productCodeEl && params.productCode) {
+      productCodeEl.textContent = params.productCode;
+    }
+    
+    if (portalNameEl && params.portal) {
+      portalNameEl.textContent = params.portal;
+    }
+    
+    // Set AWS token (show last 8 characters for security)
+    const awsTokenEl = document.getElementById('unsubscribed-aws-token');
+    if (awsTokenEl && params.awsToken) {
+      const truncatedToken = params.awsToken.length > 8 ? 
+        `...${params.awsToken.slice(-8)}` : 
+        params.awsToken;
+      awsTokenEl.textContent = `Token: ${truncatedToken}\nFull token available for support if needed`;
+    } else if (awsTokenEl) {
+      awsTokenEl.textContent = 'Token: Not available';
     }
   },
   

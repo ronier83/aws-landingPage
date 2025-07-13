@@ -117,6 +117,69 @@
       </div>
     </div>
 
+    <!-- Unsubscribed Section (shown when error=UNSUBSCRIBED) -->
+    <div id="unsubscribed-section" style="display: none;">
+      <div class="loading-container">
+        <h2 class="loading-title" style="color: #ff9500;">⚠️ Subscription Cancelled</h2>
+        <p class="loading-message">
+          Your AWS Marketplace subscription has been cancelled and your CTERA Portal has been removed.
+        </p>
+        
+        <div class="success-message" style="border-color: rgba(255, 149, 0, 0.3); background-color: rgba(255, 149, 0, 0.1);">
+          <div class="success-title" style="color: #ff9500;">Subscription Status</div>
+          <div class="success-details">
+            <p>Your subscription was cancelled and your portal has been deleted as requested.</p>
+            <p><strong>Portal deletion date:</strong> <span id="unsubscribed-deletion-date">Not available</span></p>
+            <p style="margin-top: 15px;">If you want to use CTERA again, you can subscribe through AWS Marketplace to get a new portal.</p>
+          </div>
+        </div>
+
+        <div class="customer-info" id="unsubscribed-customer-info">
+          <div class="customer-info-title">Previous Subscription Details</div>
+          <div class="customer-detail">
+            <span class="customer-label">Customer ID:</span>
+            <span class="customer-value" id="unsubscribed-customer-id">Loading...</span>
+          </div>
+          <div class="customer-detail">
+            <span class="customer-label">Product Code:</span>
+            <span class="customer-value" id="unsubscribed-product-code">Loading...</span>
+          </div>
+          <div class="customer-detail">
+            <span class="customer-label">Portal Name:</span>
+            <span class="customer-value" id="unsubscribed-portal-name">Loading...</span>
+          </div>
+          <div class="customer-detail">
+            <span class="customer-label">Status:</span>
+            <span class="customer-value" style="color: #ff9500;">UNSUBSCRIBED</span>
+          </div>
+        </div>
+
+        <div class="next-steps" style="border-color: rgba(255, 149, 0, 0.3); background-color: rgba(255, 149, 0, 0.1);">
+          <div class="next-steps-title" style="color: #ff9500;">What to do next:</div>
+          <div class="next-steps-content">
+            <ol>
+              <li><strong>To continue using CTERA:</strong> Subscribe again through AWS Marketplace</li>
+              <li><strong>For questions about billing:</strong> Contact AWS Marketplace support</li>
+              <li><strong>For technical support:</strong> Contact CTERA support team</li>
+            </ol>
+            <p style="margin-top: 15px;">
+              <strong>Need help?</strong> Email us at <a href="mailto:support@ctera.com" style="color: #ff9500;">support@ctera.com</a> 
+              and include your customer ID and the token details below.
+            </p>
+          </div>
+        </div>
+
+        <button id="unsubscribed-show-token-btn" type="button" style="margin-top: 30px; background: #ff9500; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-family: 'Montserrat', Arial, sans-serif; font-weight: 500; cursor: pointer; transition: background 0.3s;">
+          Show Token Details for Support
+        </button>
+        <div id="unsubscribed-token-support-section" style="display: none; margin-top: 20px;">
+          <span style="color: #ff9500;">Token Details for Support:</span>
+          <pre id="unsubscribed-aws-token" style="color: #fff; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; word-break: break-all; font-size: 0.95em;">Loading...</pre>
+          <div style="font-size:0.8em; color:rgba(255,255,255,0.7); margin-top:8px;">Share these details with CTERA support if you need assistance with your subscription.</div>
+        </div>
+      </div>
+    </div>
+
     <!-- DNS Selection Section (shown when step=dns-selection) -->
     <div id="dns-selection-section" style="display: none;">
       <div class="loading-container">

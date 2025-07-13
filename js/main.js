@@ -37,7 +37,9 @@ function parseUrlParameters() {
     error: urlParams.get('error'),
     errorMessage: urlParams.get('message'),
     // Additional registration data
-    registrationDate: urlParams.get('registration_date')
+    registrationDate: urlParams.get('registration_date'),
+    // Unsubscribed customer parameters
+    deletionDate: urlParams.get('deletion_date')
   };
 }
 
@@ -103,6 +105,15 @@ function setupTokenDisplayButtons() {
   if (errorShowDetailsBtn) {
     errorShowDetailsBtn.addEventListener('click', function() {
       document.getElementById('error-details-section').style.display = 'block';
+      this.style.display = 'none';
+    });
+  }
+
+  // Unsubscribed section
+  const unsubscribedShowTokenBtn = document.getElementById('unsubscribed-show-token-btn');
+  if (unsubscribedShowTokenBtn) {
+    unsubscribedShowTokenBtn.addEventListener('click', function() {
+      document.getElementById('unsubscribed-token-support-section').style.display = 'block';
       this.style.display = 'none';
     });
   }
