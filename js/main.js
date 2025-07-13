@@ -16,19 +16,28 @@ window.CteraApp = {
 
 /**
  * Parse URL parameters and extract relevant data
+ * Handles AWS Marketplace integration parameters
  */
 function parseUrlParameters() {
   const urlParams = new URLSearchParams(window.location.search);
   
   return {
+    // AWS Marketplace token - can come from various sources
     awsToken: urlParams.get('x-amzn-marketplace-token') || urlParams.get('token'),
+    // Customer and product information from AWS Marketplace
     customerId: urlParams.get('customer'),
     productCode: urlParams.get('product'),
+    // Portal/tenant information
     tenantName: urlParams.get('tenant'),
     portal: urlParams.get('portal'),
+    portalUrl: urlParams.get('portalUrl'),
+    // Flow control parameters
     step: urlParams.get('step'),
+    // Error handling parameters
     error: urlParams.get('error'),
-    errorMessage: urlParams.get('message')
+    errorMessage: urlParams.get('message'),
+    // Additional registration data
+    registrationDate: urlParams.get('registration_date')
   };
 }
 

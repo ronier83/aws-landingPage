@@ -6,7 +6,7 @@
 window.Email = {
   
   /**
-   * Validate email address format
+   * Validate email address format (matches Lambda function validation)
    */
   validateEmail(email) {
     if (!email || email.trim() === '') {
@@ -16,8 +16,8 @@ window.Email = {
       };
     }
     
-    // Basic email validation regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Lambda function email validation regex
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     
     if (!emailRegex.test(email)) {
       return {
@@ -33,7 +33,7 @@ window.Email = {
   },
   
   /**
-   * Validate DNS name format
+   * Validate DNS name format (matches Lambda function validation exactly)
    */
   validateDnsName(dnsName) {
     if (!dnsName || dnsName.trim() === '') {
@@ -45,28 +45,44 @@ window.Email = {
     
     const cleanDnsName = dnsName.trim();
     
-    // Check length requirements
-    if (cleanDnsName.length < 3 || cleanDnsName.length > 20) {
+    // Must be 3-50 characters (Lambda requirement)
+    if (cleanDnsName.length < 3 || cleanDnsName.length > 50) {
       return {
         isValid: false,
-        message: 'Portal name must be 3-20 characters'
+        message: 'DNS name must be between 3 and 50 characters'
       };
     }
     
-    // Check valid characters (letters, numbers, hyphens only)
-    const dnsRegex = /^[a-zA-Z0-9-]+$/;
-    if (!dnsRegex.test(cleanDnsName)) {
+    // Must start and end with alphanumeric (Lambda requirement)
+    if (!cleanDnsName[0].match(/[a-zA-Z0-9]/) || !cleanDnsName[cleanDnsName.length - 1].match(/[a-zA-Z0-9]/)) {
       return {
         isValid: false,
-        message: 'Portal name can only contain letters, numbers, and hyphens'
+        message: 'DNS name must start and end with a letter or number'
       };
     }
     
-    // Check that it doesn't start or end with hyphen
-    if (cleanDnsName.startsWith('-') || cleanDnsName.endsWith('-')) {
+    // Only lowercase letters, numbers, and hyphens (Lambda requirement)
+    if (!cleanDnsName.match(/^[a-z0-9-]+$/)) {
       return {
         isValid: false,
-        message: 'Portal name cannot start or end with a hyphen'
+        message: 'DNS name can only contain lowercase letters, numbers, and hyphens'
+      };
+    }
+    
+    // No consecutive hyphens (Lambda requirement)
+    if (cleanDnsName.includes('--')) {
+      return {
+        isValid: false,
+        message: 'DNS name cannot contain consecutive hyphens'
+      };
+    }
+    
+    // Reserved names check (Lambda requirement)
+    const reservedNames = ['admin', 'api', 'www', 'mail', 'ftp', 'test', 'staging', 'prod', 'production', 'dev', 'development'];
+    if (reservedNames.includes(cleanDnsName.toLowerCase())) {
+      return {
+        isValid: false,
+        message: `'${cleanDnsName}' is a reserved name and cannot be used`
       };
     }
     

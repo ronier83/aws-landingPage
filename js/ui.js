@@ -7,6 +7,7 @@ window.UI = {
   
   /**
    * Initialize sections based on URL parameters
+   * Implements customer status flow according to Lambda API
    */
   initializeSections(params) {
     console.log('UI: Initializing sections with params:', params);
@@ -31,16 +32,103 @@ window.UI = {
     } else if (params.step === 'registration-complete') {
       this.showRegistrationCompleteSection(params, sections.registrationComplete);
     } else if (params.step === 'dns-selection') {
-      // Always show DNS selection form - let Lambda handle deduplication based on actual DynamoDB state
-      this.showDnsSelectionSection(params, sections.dnsSelection);
+      // Check customer status first, then show appropriate section
+      this.checkCustomerStatusAndShowSection(params, sections);
     } else if (params.step === 'complete') {
       // Portal creation completed successfully - show completion page
       this.showCompletionSection(params, sections.completion);
     } else if (!params.awsToken && !params.customerId && !params.productCode) {
       // No valid AWS marketplace parameters - show guidance instead of misleading success
       this.showNoSubscriptionSection(sections.noSubscription, sections.completion);
+    } else if (params.customerId && params.productCode && params.awsToken) {
+      // Has AWS Marketplace parameters - check customer status
+      this.checkCustomerStatusAndShowSection(params, sections);
     } else {
       this.showCompletionSection(params, sections.completion);
+    }
+  },
+  
+  /**
+   * Check customer status via Lambda API and show appropriate section
+   */
+  async checkCustomerStatusAndShowSection(params, sections) {
+    console.log('UI: Checking customer status via Lambda API');
+    
+    try {
+      // Check customer status via Lambda
+      const statusResult = await Lambda.checkCustomerStatus({
+        customerId: params.customerId,
+        productCode: params.productCode,
+        awsToken: params.awsToken
+      });
+      
+      if (statusResult.success) {
+        this.handleCustomerStatus(statusResult.status, statusResult.data, params, sections);
+      } else {
+        // Error checking status - show error section
+        const errorParams = {
+          ...params,
+          error: 'STATUS_CHECK_FAILED',
+          errorMessage: statusResult.message || 'Failed to check customer status'
+        };
+        this.showErrorSection(errorParams, sections.error);
+      }
+    } catch (error) {
+      console.error('UI: Error checking customer status:', error);
+      const errorParams = {
+        ...params,
+        error: 'STATUS_CHECK_ERROR',
+        errorMessage: 'Unable to verify customer status. Please try again.'
+      };
+      this.showErrorSection(errorParams, sections.error);
+    }
+  },
+  
+  /**
+   * Handle different customer statuses from Lambda API
+   */
+  handleCustomerStatus(status, data, params, sections) {
+    console.log('UI: Handling customer status:', status, data);
+    
+    switch (status) {
+      case 'AVAILABLE':
+        // New customer - show DNS selection form
+        this.showDnsSelectionSection(params, sections.dnsSelection);
+        break;
+        
+      case 'FULFILLED':
+        // Customer already has a portal - redirect to portal
+        if (data.portal_url) {
+          this.showFulfilledCustomerSection(params, data, sections.completion);
+        } else {
+          // Has portal but no URL - show completion with info
+          this.showCompletionSection(params, sections.completion);
+        }
+        break;
+        
+      case 'REGISTERED':
+        // Customer registered but portal creation pending
+        this.showRegisteredCustomerSection(params, data, sections.registrationComplete);
+        break;
+        
+      case 'CREATION_FAILED':
+        // Portal creation failed - allow retry
+        this.showCreationFailedSection(params, data, sections.dnsSelection);
+        break;
+        
+      case 'STALE_REGISTRATION':
+        // Registration is stale - allow fresh start
+        this.showDnsSelectionSection(params, sections.dnsSelection);
+        break;
+        
+      default:
+        // Unknown status - show error
+        const errorParams = {
+          ...params,
+          error: 'UNKNOWN_STATUS',
+          errorMessage: `Unknown customer status: ${status}`
+        };
+        this.showErrorSection(errorParams, sections.error);
     }
   },
   
@@ -88,6 +176,152 @@ window.UI = {
     
     // Set AWS token
     setAwsToken('reg-aws-token', params.awsToken);
+  },
+  
+  /**
+   * Show section for customers who already have a portal (FULFILLED status)
+   */
+  showFulfilledCustomerSection(params, data, section) {
+    if (!section) return;
+    
+    console.log('UI: Showing fulfilled customer section');
+    section.style.display = 'block';
+    CteraApp.state.currentSection = 'fulfilled-customer';
+    
+    // Modify section title and content
+    const titleEl = section.querySelector('.loading-title');
+    if (titleEl) {
+      titleEl.innerHTML = '✅ Portal Already Available';
+      titleEl.style.color = '#00CDAF';
+    }
+    
+    // Modify main message
+    const messageEl = section.querySelector('.loading-message');
+    if (messageEl) {
+      messageEl.innerHTML = `
+        Your CTERA Portal is already available and ready to use!<br>
+        You can access it directly using the link below.
+      `;
+    }
+    
+    // Modify success message section
+    const successMessageEl = section.querySelector('.success-message');
+    if (successMessageEl) {
+      successMessageEl.innerHTML = `
+        <div class="success-title">🚀 Access Your Portal</div>
+        <div class="success-details">
+          <p style="margin-bottom: 20px;">Your portal is ready and available at:</p>
+          <div style="background: rgba(0, 205, 175, 0.1); border: 1px solid #00CDAF; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <a href="${data.portal_url}" target="_blank" style="color: #00CDAF; text-decoration: none; font-weight: 600; font-size: 18px;">
+              ${data.portal_url}
+            </a>
+          </div>
+          <p style="margin-top: 20px; font-size: 14px; color: rgba(255,255,255,0.8);">
+            Click the link above to access your portal. If you need login credentials, please check your email or contact support.
+          </p>
+        </div>
+      `;
+    }
+    
+    // Show customer info
+    const customerInfoEl = section.querySelector('#customer-info');
+    if (customerInfoEl) {
+      customerInfoEl.style.display = 'block';
+      const customerIdEl = customerInfoEl.querySelector('#customer-id');
+      const productCodeEl = customerInfoEl.querySelector('#product-code');
+      const tenantNameEl = customerInfoEl.querySelector('#tenant-name');
+      
+      if (customerIdEl && params.customerId) {
+        customerIdEl.textContent = params.customerId;
+      }
+      if (productCodeEl && params.productCode) {
+        productCodeEl.textContent = params.productCode;
+      }
+      if (tenantNameEl && data.portal_url) {
+        tenantNameEl.textContent = data.portal_url;
+      }
+    }
+    
+    // Set AWS token
+    setAwsToken('aws-token', params.awsToken);
+  },
+  
+  /**
+   * Show section for customers who are registered but portal creation is pending (REGISTERED status)
+   */
+  showRegisteredCustomerSection(params, data, section) {
+    if (!section) return;
+    
+    console.log('UI: Showing registered customer section');
+    section.style.display = 'block';
+    CteraApp.state.currentSection = 'registered-customer';
+    
+    // Modify section title and content
+    const titleEl = section.querySelector('.loading-title');
+    if (titleEl) {
+      titleEl.innerHTML = '⏳ Portal Creation in Progress';
+      titleEl.style.color = '#F39200';
+    }
+    
+    // Modify main message
+    const messageEl = section.querySelector('.loading-message');
+    if (messageEl) {
+      const registrationDate = data.registration_date ? new Date(data.registration_date).toLocaleString() : 'recently';
+      messageEl.innerHTML = `
+        Your AWS Marketplace subscription has been registered ${registrationDate}.<br>
+        Portal creation is currently in progress and you will receive an email with access credentials shortly.
+      `;
+    }
+    
+    // Show customer info
+    const customerInfoEl = section.querySelector('#reg-customer-info');
+    if (customerInfoEl) {
+      customerInfoEl.style.display = 'block';
+      populateCustomerInfo('reg', params);
+    }
+    
+    // Set AWS token
+    setAwsToken('reg-aws-token', params.awsToken);
+  },
+  
+  /**
+   * Show section for customers where portal creation failed (CREATION_FAILED status)
+   */
+  showCreationFailedSection(params, data, section) {
+    if (!section) return;
+    
+    console.log('UI: Showing creation failed section');
+    section.style.display = 'block';
+    CteraApp.state.currentSection = 'creation-failed';
+    
+    // Modify section title and content
+    const titleEl = section.querySelector('.loading-title');
+    if (titleEl) {
+      titleEl.innerHTML = '⚠️ Portal Creation Failed - Retry Available';
+      titleEl.style.color = '#ff6b6b';
+    }
+    
+    // Modify main message
+    const messageEl = section.querySelector('.loading-message');
+    if (messageEl) {
+      messageEl.innerHTML = `
+        There was an issue creating your portal previously.<br>
+        Please try again by providing your email address and choosing a portal name below.
+      `;
+    }
+    
+    // Show customer info
+    const customerInfoEl = section.querySelector('#dns-customer-info');
+    if (customerInfoEl) {
+      customerInfoEl.style.display = 'block';
+      populateCustomerInfo('dns', params);
+    }
+    
+    // Set AWS token
+    setAwsToken('dns-aws-token', params.awsToken);
+    
+    // Initialize DNS form functionality
+    this.initializeDnsForm(params);
   },
   
   /**
@@ -326,8 +560,12 @@ window.UI = {
         
         // Set tenant name if available
         const tenantNameEl = document.getElementById('tenant-name');
-        if (tenantNameEl && params.tenantName) {
-          tenantNameEl.textContent = params.tenantName + '.use.azure.cterafs.com';
+        if (tenantNameEl) {
+          if (params.portalUrl) {
+            tenantNameEl.textContent = params.portalUrl;
+          } else if (params.tenantName) {
+            tenantNameEl.textContent = params.tenantName + '.use.azure.cterafs.com';
+          }
         }
       }
     }
@@ -343,8 +581,14 @@ window.UI = {
     
     if (!dnsForm || !dnsNameInput || !previewUrl) return;
     
-    // Update preview URL as user types
+    // Update preview URL as user types and enforce lowercase
     dnsNameInput.addEventListener('input', function() {
+      // Enforce lowercase
+      const lowercaseValue = this.value.toLowerCase();
+      if (this.value !== lowercaseValue) {
+        this.value = lowercaseValue;
+      }
+      
       const value = this.value || 'yourname';
       previewUrl.textContent = value + '.use.azure.cterafs.com';
     });
@@ -416,10 +660,13 @@ window.UI = {
   /**
    * Redirect to completion page after successful provisioning
    */
-  redirectToCompletion(tenantName) {
+  redirectToCompletion(tenantName, portalUrl) {
     const completionUrl = new URL(window.location.href);
     completionUrl.searchParams.set('step', 'complete');
     completionUrl.searchParams.set('tenant', tenantName);
+    if (portalUrl) {
+      completionUrl.searchParams.set('portalUrl', portalUrl);
+    }
     
     setTimeout(() => {
       window.location.href = completionUrl.toString();
