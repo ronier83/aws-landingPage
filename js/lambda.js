@@ -14,11 +14,11 @@ window.Lambda = {
     console.log('Lambda: Checking customer status...', { customerId, productCode });
     
     try {
-      // Build URL with query parameters
+      // Build URL with query parameters - ensure proper URL encoding
       const url = new URL(CteraApp.config.apiEndpoint);
-      url.searchParams.set('customer', customerId);
-      url.searchParams.set('product', productCode);
-      url.searchParams.set('token', awsToken);
+      url.searchParams.set('customer', encodeURIComponent(customerId));
+      url.searchParams.set('product', encodeURIComponent(productCode));
+      url.searchParams.set('token', encodeURIComponent(awsToken));
       
       console.log('Lambda: Sending status check request:', url.toString());
       
@@ -66,14 +66,14 @@ window.Lambda = {
     UI.showFormMessage('Provisioning your CTERA Portal...', 'loading');
     
     try {
-      // Prepare request payload according to Lambda specs
+      // Prepare request payload according to Lambda specs - ensure proper encoding
       const payload = {
         action: 'provision',
         customer: customerId,
         product: productCode,
         dnsName: dnsName,
         email: customerEmail,
-        token: awsToken  // Include the marketplace token for proper fulfillment
+        token: awsToken  // Token is already properly encoded from URL parsing
       };
       
       console.log('Lambda: Sending provision request:', payload);
