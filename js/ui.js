@@ -104,8 +104,8 @@ window.UI = {
         break;
         
       case 'REGISTERED':
-        // Customer registered but portal creation pending
-        this.showRegisteredCustomerSection(params, data, sections.registrationComplete);
+        // Customer registered but portal creation pending - show DNS selection form
+        this.showDnsSelectionSection(params, sections.dnsSelection);
         break;
         
       case 'CREATION_FAILED':
