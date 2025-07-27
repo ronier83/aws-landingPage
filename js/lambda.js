@@ -14,11 +14,11 @@ window.Lambda = {
     console.log('Lambda: Checking customer status...', { customerId, productCode });
     
     try {
-      // Build URL with query parameters - URLSearchParams handles encoding automatically
+      // Build URL with query parameters - decode token first to prevent double encoding
       const url = new URL(CteraApp.config.apiEndpoint);
       url.searchParams.set('customer', customerId);
       url.searchParams.set('product', productCode);
-      url.searchParams.set('token', awsToken);
+      url.searchParams.set('token', decodeURIComponent(awsToken));
       
       console.log('Lambda: Sending status check request:', url.toString());
       
