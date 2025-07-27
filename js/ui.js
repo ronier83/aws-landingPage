@@ -32,8 +32,9 @@ window.UI = {
       this.showUnsubscribedStatus(params, sections.unsubscribed);
     } else if (params.error) {
       this.showErrorSection(params, sections.error);
-    } else if (params.step === 'registration-complete') {
-      this.showRegistrationCompleteSection(params, sections.registrationComplete);
+    } else if (params.step === 'registration-complete' && params.customerId && params.productCode && params.awsToken) {
+      // Registration complete but check if customer needs to create portal
+      this.checkCustomerStatusAndShowSection(params, sections);
     } else if (params.step === 'dns-selection') {
       // Check customer status first, then show appropriate section
       this.checkCustomerStatusAndShowSection(params, sections);
@@ -68,22 +69,15 @@ window.UI = {
       if (statusResult.success) {
         this.handleCustomerStatus(statusResult.status, statusResult.data, params, sections);
       } else {
-        // Error checking status - show error section
-        const errorParams = {
-          ...params,
-          error: 'STATUS_CHECK_FAILED',
-          errorMessage: statusResult.message || 'Failed to check customer status'
-        };
-        this.showErrorSection(errorParams, sections.error);
+        // Error checking status - show DNS selection form instead of error
+        console.log('UI: Status check failed, showing DNS selection form for new customer');
+        this.showDnsSelectionSection(params, sections.dnsSelection);
       }
     } catch (error) {
       console.error('UI: Error checking customer status:', error);
-      const errorParams = {
-        ...params,
-        error: 'STATUS_CHECK_ERROR',
-        errorMessage: 'Unable to verify customer status. Please try again.'
-      };
-      this.showErrorSection(errorParams, sections.error);
+      // Show DNS selection form instead of error for new customers
+      console.log('UI: Status check error, showing DNS selection form for new customer');
+      this.showDnsSelectionSection(params, sections.dnsSelection);
     }
   },
   
