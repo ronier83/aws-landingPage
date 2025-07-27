@@ -14,21 +14,11 @@ window.Lambda = {
     console.log('Lambda: Checking customer status...', { customerId, productCode });
     
     try {
-      // Build URL with query parameters - handle token encoding properly
+      // Build URL with query parameters - use token as-is from AWS Marketplace
       const url = new URL(CteraApp.config.apiEndpoint);
       url.searchParams.set('customer', customerId);
       url.searchParams.set('product', productCode);
-      
-      // Handle token encoding - if it contains %2F, it's already encoded, so decode it first
-      let tokenToUse = awsToken;
-      if (awsToken.includes('%2F') || awsToken.includes('%2B')) {
-        tokenToUse = decodeURIComponent(awsToken);
-      }
-      
-      console.log('Lambda: Original token:', awsToken);
-      console.log('Lambda: Final token:', tokenToUse);
-      
-      url.searchParams.set('token', tokenToUse);
+      url.searchParams.set('token', awsToken); // Use token AS-IS, don't decode!
       
       console.log('Lambda: Sending status check request:', url.toString());
       
